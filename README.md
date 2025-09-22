@@ -164,6 +164,29 @@ All the above (except `/`) require `Authorization: Bearer <token>`.
 4) Export Excel → formats each statement into a worksheet
 5) Build/export audit Trial → detailed mapping and roll-up info per account
 
+## Auto-mapping Overview
+
+The system auto-maps uploaded TEA trial balances to TEA/GASB categories using documented patterns and a few targeted exact matches.
+
+- What we parse from `account_code` (TEA 20-digit structure):
+  - `fund_code` = positions 0–2, `function_code` = 3–4, `object_code` = 5–8, `sub_object_code` = 9–12, `location_code` = 13–18.
+- GASB category by object-code family:
+  - Assets: 1XXX → current assets by pattern (11XX cash & equivalents, 12XX receivables, 13XX inventories, 14XX prepaid/other) and capital assets 15XX; deferred outflows 17XX.
+  - Liabilities: 2XXX → current (21XX) vs long-term (25XX); deferred inflows 26XX.
+  - Net position/fund balance: 3XXX → restricted (38XX), unrestricted (39XX), fund balance ranges (34XX/35XX/36XX).
+  - Revenues/Expenditures: 5XXX revenues (57XX local, 58XX state, 59XX federal); 6XXX expenditures by `function_code` (e.g., 11 Instruction, 41 General Admin, 51 Facilities, 72 Interest, etc.).
+- Fund category by `fund_code`:
+  - 1XX → General Fund; 2XX Special Revenue; 5XX Debt Service; 6XX Capital Projects; 7XX Permanent (others aggregate to Non-Major in funds statements).
+- Exact-code handling for statement lines (examples):
+  - 1225 Property Taxes Receivable (Net), 1240 Due from Other Governments, 1267 Due from Fiduciary, 2110 Accounts Payable, 2605/2606 Deferred Inflow pension/OPEB, 3820/3850 restricted net position.
+- Fallbacks and roll-ups:
+  - Unrecognized 12XX roll up to Other Receivables (1290); other capital/long-term items roll into nearest parent line.
+  - Unmapped stay flagged with `unmapped_accounts = true` for audit visibility.
+- Customization:
+  - Users can override mappings in the Mapping UI; saving updates the per-user mapping table (`user_id`, `account_code` unique).
+  - Auto-map seeds defaults; you can re-run auto-map after a new upload, or bulk edit via CSV.
+
+
 ## Statement Coverage (current)
 
 - Statement of Net Position (government-wide)
