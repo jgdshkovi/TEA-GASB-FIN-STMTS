@@ -15,19 +15,29 @@ A full-stack application that processes Texas school district trial balances and
   - Auto-detects encoding and delimiter (tab, comma, pipe, semicolon, single/double space)
   - Robust parsing of ASCII/CSV with normalization (numeric coercion, empty-row removal)
 - Account Mapping
-  - Auto-map from uploaded trial balance to default TEA/GASB buckets
+  - Auto-map from uploaded trial balance to default TEA/GASB categories
   - Paginated mapping fetch and save; server-side validation
   - Delete-all resets mappings and clears audit Trial
 - Financial Statements
   - Generates Government-wide and Governmental Funds statements (multiple statements combined)
+    - 1. Government-wide - Statement of Net Position
+    - 2. Government-wide - Statement of Activities
+    - 3. Governmental Funds - Balance Sheet
+    - 4. Governmental Funds - Statement of Revenues, Expenditures, and Changes in Fund Balances
 - Audit Trial
   - Detailed, per-account, line-level mapping breakdown with statement line mapping and roll-up notes
   - Export audit Trial to CSV
 - Export
   - Excel export with multiple sheets and basic formatting
+  - Print to PDF option from the web-app
 - Frontend
   - Modern React UI (upload, mapping, statements, export, audit)
   - Authentication flow and API client with token handling
+  - Sample Credentials for `John Doe`: 
+    - jd123@gmail.com
+    - johnny123
+ - Performance
+   - Vectorized processing in key generators for faster large-file handling
 
 ## Project Structure
 
@@ -161,15 +171,27 @@ All the above (except `/`) require `Authorization: Bearer <token>`.
 - Balance Sheet — Governmental Funds
 - Statement of Revenues, Expenditures, and Changes in Fund Balances — Governmental Funds
 
+## Performance
+
+- Guideline: single-task operations on large files (≈200k rows, ≤25 MB) complete within ≈15 seconds on free-tier hardware.
+- Indicative timings with recent vectorization (200k synthetic rows on a typical dev machine):
+  - Governmental Funds — Balance Sheet: ≈1.2s
+  - Governmental Funds — Revenues & Expenditures: ≈1.9s
+  - Government-wide generators: ≈7s each (run independently)
+  - Excel export: ≈0.3s
+- Notes:
+  - The 15s target applies per task (e.g., generating one statement or exporting), not the sum of all tasks.
+  - Audit trail generation and multi-step workflows may exceed 15s when combined; use exports or cache intermediate results as needed.
+
 ## Validation & Roll-ups
 
 - Server validates mapping completeness upon save
 - Roll-up heuristics on object code ranges for aggregation into canonical lines (e.g., cash equivalents, receivables, liabilities)
 
-## Security Notes
+<!-- ## Security Notes
 
 - Replace `SECRET_KEY` and configure with environment variables in production
-- Consider HTTPS, stricter CORS, and longer token rotation policies
+- Consider HTTPS, stricter CORS, and longer token rotation policies -->
 
 ## Testing & Demo
 
@@ -178,9 +200,56 @@ All the above (except `/`) require `Authorization: Bearer <token>`.
 
 ## Deployment
 
-- Dockerfiles and Procfile included for common platforms (Render, Vercel, Heroku)
-- Ensure persistent storage for `tea_financial.db` or migrate to managed DB
-- Set `NEXT_PUBLIC_API_BASE_URL` in frontend environment
+### Backend on Render (FastAPI)
+
+- Hosted at: `https://ggcpas.onrender.com`
+- Health check: `GET https://ggcpas.onrender.com/health` should return OK
+- CORS is enabled with allow-all in `main.py` (suitable for development and external frontends)
+
+Notes:
+- SQLite file `tea_financial.db` is created in the working directory. 
+- For production-grade persistence, mount a disk or migrate to a managed database.
+
+### Frontend on Vercel (Next.js)
+
+Environment variable required:
+- `NEXT_PUBLIC_API_BASE_URL`
+  - Production/Preview: `https://ggcpas.onrender.com`
+  - Development (local): `http://localhost:8000`
+
+Behavior:
+- `frontend/services/api.ts` and `frontend/next.config.js` default to `https://ggcpas.onrender.com` in production if the env var is not set.
+- A rewrite maps `/api/*` to `${NEXT_PUBLIC_API_BASE_URL}/api/*` for any relative calls.
+
+Vercel CLI (Windows PowerShell):
+```powershell
+npm i -g vercel
+vercel login --yes | Out-Null
+cd frontend
+vercel --confirm --yes
+
+# Set environment variables
+$val = "https://ggcpas.onrender.com"
+"$val" > tmp.txt; type tmp.txt | vercel env add NEXT_PUBLIC_API_BASE_URL production --yes
+"$val" > tmp.txt; type tmp.txt | vercel env add NEXT_PUBLIC_API_BASE_URL preview --yes
+$val = "http://localhost:8000"
+"$val" > tmp.txt; type tmp.txt | vercel env add NEXT_PUBLIC_API_BASE_URL development --yes
+del tmp.txt
+
+# Deploy
+vercel --yes       # preview
+vercel --prod --yes
+```
+
+Vercel Dashboard:
+- Project Settings → Environment Variables
+  - `NEXT_PUBLIC_API_BASE_URL` = `https://ggcpas.onrender.com` (Production, Preview)
+  - `NEXT_PUBLIC_API_BASE_URL` = `http://localhost:8000` (Development)
+
+Post-deploy verification:
+- Open the Vercel URL and log in/register.
+- Upload a file and generate statements.
+- If API calls fail, confirm the env var values above.
 
 ## Known Limitations
 
