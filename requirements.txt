@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+pandas
+numpy
+openpyxl
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+jinja2
+aiofiles
+chardet
+fastapi-users[sqlalchemy]
+sqlalchemy
+aiosqlite
+email-validator
