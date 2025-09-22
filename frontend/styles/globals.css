@@ -1,0 +1,252 @@
+/* Custom styles for TEA Financial Statement Generator */
+
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f9fa;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 16.666667%; /* lg-2 equivalent (2/12 columns) */
+  height: 100vh;
+  background-color: #fff;
+  border-right: 1px solid #dee2e6;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.main-content {
+  margin-left: 16.666667%; /* Offset for fixed sidebar (lg-10 equivalent) */
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 10px;
+  padding: 40px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.upload-area:hover {
+  border-color: var(--primary-color);
+  background-color: #f8f9ff;
+}
+
+.upload-area.dragover {
+  border-color: var(--primary-color);
+  background-color: #e3f2fd;
+}
+
+.file-info {
+  background-color: #e9ecef;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.statement-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-link {
+  color: #495057;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  background-color: #e9ecef;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.nav-link.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.nav-link i {
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+  border-radius: 10px;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 8px 16px;
+}
+
+.table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  padding: 12px;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.table tbody td {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+.form-control, .form-select {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 8px 12px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+  padding: 12px 16px;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #e9ecef;
+}
+
+.progress-bar {
+  background-color: var(--primary-color);
+  border-radius: 4px;
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 25%; /* md-3 equivalent (3/12 columns) */
+  }
+  
+  .main-content {
+    margin-left: 25%; /* md-9 equivalent (9/12 columns) */
+    padding: 15px;
+  }
+  
+  .upload-area {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    padding: 15px;
+  }
+}
+
+/* Print styles for PDF export */
+@media print {
+  .sidebar, .btn, .alert {
+    display: none !important;
+  }
+  
+  .main-content {
+    padding: 0;
+  }
+  
+  .statement-section {
+    border: none;
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+    box-shadow: none;
+  }
+  
+  .table {
+    font-size: 12px;
+    box-shadow: none;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
